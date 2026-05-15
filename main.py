@@ -10,7 +10,7 @@ def update(widget,text):
     widget.config(state='normal')
     widget.delete('1.0',"end")
     widget.insert('1.0',text)
-    widget.config(state='disabled', bg='#dddddd', disabledforeground='black')
+    widget.config(state='disabled',bg='#f0f0f0',fg='black')
 
 """Fetches news data from the URL provided in the urlText widget,"""
 def summarizeNewsUrl():
@@ -22,11 +22,12 @@ def summarizeNewsUrl():
     
     try:
         data = get_news_data(url)
-        update(title, data.title)
-        update(author, ', '.join(data.authors))
-        update(date, str(data.publish_date))
-        update(sentimentAnalysis,
-               f"Polarity: {data['sentiment']}, Sentiment: {data['sentiment_label']}")
+        print("URL =", url)
+        update(title, data["title"])
+        update(authors,data["authors"])
+        update(date, data["publish_date"])
+        update(summary, data["summary"])
+        update(sentimentAnalysis, data["sentiment"])
     
     except Exception as e:
         update(sentimentAnalysis, f"Error fetching article: {e}")
@@ -46,12 +47,12 @@ title=tk.Text(root,height=1,width=140)
 title.config(state='disabled')
 title.pack()
 
-alabel=tk.Label(root,text="Authors")
+alabel=tk.Label(root,text="Author")
 alabel.pack()
 
-author=tk.Text(root,height=1,width=140) 
-author.config(state='disabled')
-author.pack()
+authors=tk.Text(root,height=1,width=140) 
+authors.config(state='disabled')
+authors.pack()
 
 plabel=tk.Label(root,text="Publication Date")
 plabel.pack()
