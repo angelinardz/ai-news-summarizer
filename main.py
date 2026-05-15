@@ -1,28 +1,91 @@
 import tkinter as tk
-import nltk
-from textblob import TextBlob
-from newspaper import Article
-nltk.download('punkt')
+from logic import get_news_data
 
-url ="https://www.bbc.com/news/live/cvgz8qverzqt"
-#creates article object 
-article= Article(url)
+#functions
+"""Updates the given widget with the provided text, 
+making it editable temporarily to allow for updates, 
+then sets it back to disabled with a specific background and text color."""
 
-article.download()
-article.parse()
-article.nlp()
+def update(widget,text):
+    widget.config(state='normal')
+    widget.delete('1.0',"end")
+    widget.insert('1.0',text)
+    widget.config(state='disabled', bg='#dddddd', disabledforeground='black')
 
-print("Title:", article.title)
-print("Authors:", article.authors)
-print("Publication Date:", article.publish_date)
-print("Summary:", article.summary)
+"""Fetches news data from the URL provided in the urlText widget,"""
+def summarizeNewsUrl():
+    
+    url=urlText.get('1.0',"end-1c").strip()
+    
+    if not url:
+        return 
+    
+    try:
+        data = get_news_data(url)
+        update(title, data.title)
+        update(author, ', '.join(data.authors))
+        update(date, str(data.publish_date))
+        update(sentimentAnalysis,
+               f"Polarity: {data['sentiment']}, Sentiment: {data['sentiment_label']}")
+    
+    except Exception as e:
+        update(sentimentAnalysis, f"Error fetching article: {e}")
+
+    
+
+
+root=tk.Tk()
+root.title("News Article Summarizer")
+root.geometry("1200x600")
+
+
+tlabel=tk.Label(root,text="Title")
+tlabel.pack()
+
+title=tk.Text(root,height=1,width=140) 
+title.config(state='disabled')
+title.pack()
+
+alabel=tk.Label(root,text="Authors")
+alabel.pack()
+
+author=tk.Text(root,height=1,width=140) 
+author.config(state='disabled')
+author.pack()
+
+plabel=tk.Label(root,text="Publication Date")
+plabel.pack()
+
+date=tk.Text(root,height=1,width=140) 
+date.config(state='disabled')
+date.pack()
+
+
+slabel=tk.Label(root,text="Summary")
+slabel.pack()
+
+summary=tk.Text(root,height=20,width=140) 
+summary.config(state='disabled')
+summary.pack()
+
+selabel=tk.Label(root,text="Sentiment Analysis")
+selabel.pack()
+
+sentimentAnalysis=tk.Text(root,height=1,width=140) 
+sentimentAnalysis.config(state='disabled')
+sentimentAnalysis.pack()
+
+ulabel=tk.Label(root,text="URL")
+ulabel.pack()
+
+urlText=tk.Text(root,height=1,width=140)
+urlText.pack() 
+
+btn=tk.Button(root,text="Summarize",command=summarizeNewsUrl)
+btn.pack()
 
 
 
-analysis = TextBlob(article.text)
-print(analysis.polarity)
-print(f'Sentiment: {"Positive" if analysis.sentiment.polarity > 0 else "Negative" if analysis.sentiment.polarity < 0 else "Neutral"}')
-
-
+root.mainloop()
 
 
