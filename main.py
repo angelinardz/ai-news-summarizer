@@ -22,7 +22,6 @@ def summarizeNewsUrl():
     
     try:
         data = get_news_data(url)
-        print("URL =", url)
         update(title, data["title"])
         update(authors,data["authors"])
         update(date, data["publish_date"])
